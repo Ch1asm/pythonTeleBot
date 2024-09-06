@@ -2,3 +2,6 @@
 botdatabase.db
 tests.py
 tggptbot.env
+botdatabase.db-shm
+botdatabase.db-wal
+botdatabase.sqbpro

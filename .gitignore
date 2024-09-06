@@ -7,3 +7,4 @@ botdatabase.db-wal
 botdatabase.sqbpro
 __pycache__/command_parser.cpython-311.pyc
 __pycache__/telbot_storage_handler.cpython-311.pyc
+__pycache__/telbot_storage_handler.cpython-311.pyc

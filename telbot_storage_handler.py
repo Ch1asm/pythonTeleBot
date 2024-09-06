@@ -3,7 +3,6 @@ import sqlite3
 import logging
 import sys
 import telebot
-import re
 from pathlib import Path
 
 
@@ -30,22 +29,31 @@ class StorageHandler:
                      first_name text,
                      last_name text,
                      username text,
-                     chat_name text)
+                     chat_name text,
+                     allowed_commands integer)
                      ''')
             cursor.execute(
-                '''CREATE TABLE IF NOT EXISTS text_messages 
-                    (message_id integer PRIMARY KEY,
+                '''CREATE TABLE IF NOT EXISTS messages 
+                    (message_id integer not null,
+                     message_thread_id integer,
                      date integer,
                      from_user_id DOUBLE,
-                     chat_id DOUBLE,
+                     chat_id DOUBLE not null,
                      reply_to_message_id integer,
-                     message_text text)
+                     message_photo text,
+                     message_voice text,
+                     message_text text,
+                     PRIMARY KEY(chat_id, message_id))
                     ''')
             cursor.execute(
                 '''CREATE TABLE IF NOT EXISTS chats 
-                    (chat_id DOUBLE primary key,
+                    (chat_id DOUBLE,
+                     chat_name text,
                      used_model text,
-                     system_message text)
+                     system_message text,
+                     allow_text integer,
+                     allow_voice integer,
+                     PRIMARY KEY(chat_id))
                     ''')
             self.connection_db.commit()
         except Exception as e:
@@ -59,7 +67,7 @@ class StorageHandler:
         self.connection_db.close()
 
     # store info about user, chat and message
-    def logtextmessage(self, message: telebot.types.Message):
+    def log_message(self, message: telebot.types.Message, photo_path, voice_path, voice_text):
         # adding user info if new
         answer = ""
         exist_users = None
@@ -82,13 +90,15 @@ class StorageHandler:
                                'first_name, '
                                'last_name, '
                                'username, '
-                               'chat_name) '
-                               'VALUES (?, ?, ?, ?, ?)',
+                               'chat_name, '
+                               'allowed_commands) '
+                               'VALUES (?, ?, ?, ?, ?, ?)',
                                (message.from_user.id,
                                 message.from_user.first_name,
                                 message.from_user.last_name,
                                 message.from_user.username,
-                                chat_name))
+                                chat_name,
+                                0))
                 self.connection_db.commit()
                 logging.debug("New user " + str(message.from_user.id) + " added")
                 answer = ("New user: \n" + str(message.from_user.id) + "\n" + chat_name)
@@ -107,12 +117,18 @@ class StorageHandler:
             try:
                 cursor.execute('INSERT INTO chats '
                                '(chat_id, '
+                               'chat_name, '
                                'used_model, '
-                               'system_message) '
-                               'VALUES (?, ?, ?)',
+                               'system_message, '
+                               'allow_text, '
+                               'allow_voice) '
+                               'VALUES (?, ?, ?, ?, ?, ?)',
                                (message.chat.id,
+                                message.chat.title,
                                 "default",
-                                "default"))
+                                "default",
+                                0,
+                                0))
                 self.connection_db.commit()
                 logging.debug("New chat " + str(message.chat.id) + " added")
                 answer = ("New chat: \n" + str(message.chat.id))
@@ -122,23 +138,32 @@ class StorageHandler:
             logging.debug("Chat " + str(message.chat.id) + " exists")
         # adding message info
         rep_mes_id = 0
+        mes_text = message.text
+        if voice_text is not None:
+            mes_text = voice_text
         if message.reply_to_message is not None:
             rep_mes_id = message.reply_to_message.id
         try:
-            cursor.execute('INSERT INTO text_messages '
+            cursor.execute('INSERT INTO messages '
                            '(message_id, '
+                           'message_thread_id, '
                            'date, '
                            'from_user_id, '
                            'chat_id, '
                            'reply_to_message_id, '
+                           'message_photo, '
+                           'message_voice, '
                            'message_text) '
-                           'VALUES (?,?,?,?,?,?)',
+                           'VALUES (?,?,?,?,?,?,?,?,?)',
                            (message.id,
+                            message.message_thread_id,
                             message.date,
                             message.from_user.id,
                             message.chat.id,
                             rep_mes_id,
-                            message.text))
+                            photo_path,
+                            voice_path,
+                            mes_text))
             self.connection_db.commit()
             logging.debug("New messaage ", message.id, " added")
         except Exception as e:
@@ -152,7 +177,7 @@ class StorageHandler:
                 "content": self.getchatnamebyid(message.from_user.id) + ": " + message.text,
             }
         ]
-
+        rows = None
         cursor = self.connection_db.cursor()
         if message.reply_to_message is not None:
             prev_msg_id = message.reply_to_message.id
@@ -162,7 +187,7 @@ class StorageHandler:
                     prev_msg = cursor.execute('SELECT reply_to_message_id,'
                                               ' message_text, '
                                               'from_user_id '
-                                              'FROM text_messages '
+                                              'FROM messages '
                                               'WHERE chat_id=? '
                                               'AND message_id=?',
                                               (message.chat.id,
@@ -194,7 +219,7 @@ class StorageHandler:
                     prev_msg_id = 0
 
         chat_sys_message = cursor.execute('SELECT system_message FROM chats WHERE chat_id=?',
-                                          (message.chat.id,))
+                                          (message.chat.id, ))
         rows = chat_sys_message.fetchall()
         if rows[0] != "default":
             sys_mes = str(rows[0])
@@ -242,35 +267,44 @@ class StorageHandler:
             logging.debug("Cannot find user in DB: ", e.__repr__(), e.args)
             return "Гость"
 
-    def command_set_chat_system_message(self, message: telebot.types.Message):
-        chat_id = message.chat.id
-        sys_message = "default"
+    # Getting list of chats where text messaging is allowed
+    def get_allowed_chat_text(self):
         cursor = self.connection_db.cursor()
         try:
-            act_chat = re.search("(?<=chat=)(.*)(?=message=)", message.text).group().strip()
-            if act_chat != "this":
-                chat_id = act_chat
-            sys_message = re.search(r"(?<=message=).*", message.text).group().strip()
+            resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_text=1')
+            return [item for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Regular expression bug: ", e.__repr__(), e.args)
-            return "regexp bug"
+            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            return []
 
+    # Getting list of chats where text messaging is allowed
+    def get_allowed_chat_voice(self):
+        cursor = self.connection_db.cursor()
         try:
-            exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=?', (chat_id, ))
+            resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_voice=1')
+            return [item for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot SELECT chat_id from database: ", e.__repr__(), e.args)
-            return "error finding chat"
-        if exist_chats.fetchone() is None:
-            return "chat does not exists"
-        else:
-            try:
-                cursor.execute('UPDATE chats '
-                               'SET system_message=?'
-                               'WHERE chat_id=?',
-                               (sys_message,
-                                chat_id,
-                                ))
-                return "System message set: " + sys_message
-            except Exception as e:
-                logging.debug("Cannot UPDATE system_message in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            return []
 
+    def get_allowed_command_users(self):
+        cursor = self.connection_db.cursor()
+        try:
+            resp = cursor.execute('SELECT user_id FROM users WHERE allowed_commands=1')
+            return [item[0] for item in resp.fetchall()]
+        except Exception as e:
+            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            return []
+
+    def execute_command(self, command: str):
+        cursor = self.connection_db.cursor()
+        try:
+            resp = cursor.execute(command)
+            answer = '\n'.join(str(item) for item in resp.fetchall())
+            if answer == "":
+                return "success"
+            return answer
+
+        except Exception as e:
+            logging.debug("Cannot execute command: " + command + "\n", e.__repr__(), e.args)
+            return "Cannot execute command: " + command + "\n"

@@ -5,3 +5,4 @@ botdatabase.db-shm
 botdatabase.db-wal
 botdatabase.sqbpro
 __pycache__/
+/__pycache__

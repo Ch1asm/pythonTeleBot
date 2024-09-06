@@ -63,10 +63,10 @@ db.sqlite3-journal
 
 # Flask stuff:
 instance/
-.webassets-cache
+*.webassets-cache
 
 # Scrapy stuff:
-.scrapy
+*.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -76,7 +76,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+*.ipynb_checkpoints
 
 # IPython
 profile_default/
@@ -107,9 +107,9 @@ ipython_config.py
 #   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
 #   in version control.
 #   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
-.pdm.toml
-.pdm-python
-.pdm-build/
+*.pdm.toml
+*.pdm-python
+*.pdm-build/
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
@@ -122,8 +122,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
-.venv
+*.env
+*.venv
 env/
 venv/
 ENV/
@@ -131,18 +131,18 @@ env.bak/
 venv.bak/
 
 # Spyder project settings
-.spyderproject
-.spyproject
+*.spyderproject
+*.spyproject
 
 # Rope project settings
-.ropeproject
+*.ropeproject
 
 # mkdocs documentation
 /site
 
 # mypy
 .mypy_cache/
-.dmypy.json
+*.dmypy.json
 dmypy.json
 
 # Pyre type checker
@@ -162,6 +162,8 @@ cython_debug/
 #.idea/
 
 #my DB files
-.db
-.db-shm
-.db-wal
+*.db
+*.db-shm
+*.db-wal
+
+#other

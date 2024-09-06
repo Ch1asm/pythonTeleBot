@@ -272,7 +272,7 @@ class StorageHandler:
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_text=1')
-            return [item for item in resp.fetchall()]
+            return [item[0] for item in resp.fetchall()]
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []
@@ -282,7 +282,7 @@ class StorageHandler:
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_voice=1')
-            return [item for item in resp.fetchall()]
+            return [item[0] for item in resp.fetchall()]
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []

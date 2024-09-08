@@ -11,8 +11,8 @@ __all__ = ["parse"]
 
 command_list = ["get", "set"]
 table_list = ["user", "chat"]
-get_chat_param_list = ["all", "chat_name", "allow_text", "allow_voice", "system_message", "used_model"]
-set_chat_param_list = ["allow_text", "allow_voice", "system_message", "model"]
+get_chat_param_list = ["all", "chat_name", "allow_text", "allow_voice", "allow_boobs", "system_message", "used_model"]
+set_chat_param_list = ["allow_text", "allow_voice", "allow_boobs", "system_message", "model"]
 get_user_param_list = ["chat_name", "allowed_commands"]
 set_user_param_list = ["chat_name", "allowed_commands"]
 

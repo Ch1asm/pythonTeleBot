@@ -173,3 +173,6 @@ cython_debug/
 #other
 tests.py
 .idea/workspace.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/vcs.xml

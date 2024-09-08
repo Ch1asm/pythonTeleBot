@@ -97,7 +97,11 @@ def boobs_handle(boobs_pass: str, message: telebot.types.Message):
     if not files:
         return "It's a disaster! We don't have tits to show!"
     boobs_file = open(boobs_pass+random.choice(files), 'rb')
-    bot.send_video(message.chat.id, boobs_file, reply_to_message_id=message.message_id)
+    bot.send_video(message.chat.id,
+                   boobs_file,
+                   reply_to_message_id=message.message_id,
+                   has_spoiler=True,
+                   supports_streaming=True)
     boobs_file.close()
     return None
 

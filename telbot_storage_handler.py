@@ -49,11 +49,13 @@ class StorageHandler:
                 '''CREATE TABLE IF NOT EXISTS chats 
                     (chat_id DOUBLE,
                      chat_name text,
+                     thread_id integer,
                      used_model text,
                      system_message text,
                      allow_text integer,
                      allow_voice integer,
-                     PRIMARY KEY(chat_id))
+                     allow_boobs integer,
+                     PRIMARY KEY(chat_id, thread_id))
                     ''')
             self.connection_db.commit()
         except Exception as e:
@@ -118,15 +120,19 @@ class StorageHandler:
                 cursor.execute('INSERT INTO chats '
                                '(chat_id, '
                                'chat_name, '
+                               'thread_id, '
                                'used_model, '
                                'system_message, '
                                'allow_text, '
-                               'allow_voice) '
-                               'VALUES (?, ?, ?, ?, ?, ?)',
+                               'allow_voice,'
+                               'allow_boobs) '
+                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                                (message.chat.id,
                                 message.chat.title,
+                                message.message_thread_id,
                                 "default",
                                 "default",
+                                0,
                                 0,
                                 0))
                 self.connection_db.commit()
@@ -272,17 +278,27 @@ class StorageHandler:
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_text=1')
-            return [item[0] for item in resp.fetchall()]
+            return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []
 
-    # Getting list of chats where text messaging is allowed
+    # Getting list of chats where voice messaging is allowed
     def get_allowed_chat_voice(self):
         cursor = self.connection_db.cursor()
         try:
-            resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_voice=1')
-            return [item[0] for item in resp.fetchall()]
+            resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_voice=1')
+            return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
+        except Exception as e:
+            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            return []
+
+    # Getting list of chats where send boobs is allowed
+    def get_allowed_chat_boobs(self):
+        cursor = self.connection_db.cursor()
+        try:
+            resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_boobs=1')
+            return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []

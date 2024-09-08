@@ -297,7 +297,7 @@ class StorageHandler:
     def get_allowed_chat_boobs(self):
         cursor = self.connection_db.cursor()
         try:
-            resp = cursor.execute('SELECT chat_id FROM chats WHERE allow_boobs=1')
+            resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_boobs=1')
             return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)

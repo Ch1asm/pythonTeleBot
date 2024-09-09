@@ -39,7 +39,7 @@ def handle_all_text(message):
     else:
         if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text:
             if stor_answer != "":
-                storage.log_message(bot.send_message(int(os.environ.get("TG_BOT_ADMIN")), stor_answer),
+                storage.log_message(bot.send_message(float(os.environ.get("TG_BOT_ADMIN")), stor_answer),
                                     None, None, None)
             answer = generate_bot_answer(message)
             if answer != "":

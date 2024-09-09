@@ -73,7 +73,7 @@ class CommandHandler:
             request = "UPDATE chats SET allow_text=0 " + where_val
             answer = storage.execute_command(request)
         elif args in self.enable_commands:
-            request = "UPDATE chats SET allow_text=1 " + "\" " + where_val
+            request = "UPDATE chats SET allow_text=1 " + where_val
             answer = storage.execute_command(request)
         else:
             answer = "Bad command arguments"

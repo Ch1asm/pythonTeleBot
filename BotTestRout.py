@@ -37,7 +37,7 @@ def handle_all_text(message):
         if boobs_ans is not None:
             storage.log_message(bot.reply_to(message, boobs_ans), None, None, None)
     else:
-        if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text:
+#        if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text or:
             if stor_answer != "":
                 storage.log_message(bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), stor_answer),
                                     None, None, None)
@@ -64,7 +64,9 @@ def generate_bot_answer(message):
              or message.from_user.id == float(os.environ.get("TG_BOT_ADMIN")))):
         handler = CommandHandler()
         if handler.is_command(message, float(os.environ.get("TG_BOT_ADMIN"))):
-            return handler.handle(message, float(os.environ.get("TG_BOT_ADMIN")), storage)
+            resp = handler.handle(message, float(os.environ.get("TG_BOT_ADMIN")), storage)
+            all_list.update(storage)
+            return resp
     # проверка на разрешенный чат
     if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text:
         if storage.checkgptstory(message, os.environ.get("APP_BOT_ID")):

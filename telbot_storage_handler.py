@@ -112,12 +112,12 @@ class StorageHandler:
         # adding chat info if new
         exist_chats = None
         try:
-            if message.message_thread_id is None:
-                exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=? and thread_id is Null',
-                                         (message.chat.id,))
-            else:
+            if message.is_topic_message:
                 exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=? and thread_id=?',
                                              (message.chat.id, message.message_thread_id, ))
+            else:
+                exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=? and thread_id is Null',
+                                             (message.chat.id,))
         except Exception as e:
             logging.debug("Cannot SELECT chat_id from database: ", e.__repr__(), e.args)
             pass
@@ -319,7 +319,6 @@ class StorageHandler:
         except Exception as e:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []
-
 
     def get_allowed_chat_commands(self):
         cursor = self.connection_db.cursor()

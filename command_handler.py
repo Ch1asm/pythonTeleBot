@@ -70,10 +70,10 @@ class CommandHandler:
             request = "SELECT allow_text FROM chats " + where_val
             answer = storage.execute_command(request)
         elif args in self.disable_commands:
-            request = "UPDATE chats SET allow_text=0" + args + "\" " + where_val
+            request = "UPDATE chats SET allow_text=0 " + where_val
             answer = storage.execute_command(request)
         elif args in self.enable_commands:
-            request = "UPDATE chats SET allow_text=1" + args + "\" " + where_val
+            request = "UPDATE chats SET allow_text=1 " + "\" " + where_val
             answer = storage.execute_command(request)
         else:
             answer = "Bad command arguments"
@@ -88,10 +88,10 @@ class CommandHandler:
             request = "SELECT allow_voice FROM chats " + where_val
             answer = storage.execute_command(request)
         elif args in self.disable_commands:
-            request = "UPDATE chats SET allow_voice=0" + args + "\" " + where_val
+            request = "UPDATE chats SET allow_voice=0 " + where_val
             answer = storage.execute_command(request)
         elif args in self.enable_commands:
-            request = "UPDATE chats SET allow_voice=1" + args+"\" " + where_val
+            request = "UPDATE chats SET allow_voice=1 " + where_val
             answer = storage.execute_command(request)
         else:
             answer = "Bad command arguments"
@@ -106,10 +106,10 @@ class CommandHandler:
             request = "SELECT allow_boobs FROM chats " + where_val
             answer = storage.execute_command(request)
         elif args in self.disable_commands:
-            request = "UPDATE chats SET allow_boobs=0" + args + "\" " + where_val
+            request = "UPDATE chats SET allow_boobs=0 " + where_val
             answer = storage.execute_command(request)
         elif args in self.enable_commands:
-            request = "UPDATE chats SET allow_boobs=1" + args+"\" " + where_val
+            request = "UPDATE chats SET allow_boobs=1 " + where_val
             answer = storage.execute_command(request)
         else:
             answer = "Bad command arguments"
@@ -124,10 +124,10 @@ class CommandHandler:
             request = "SELECT allow_commands FROM chats " + where_val
             answer = storage.execute_command(request)
         elif args in self.disable_commands:
-            request = "UPDATE chats SET allow_commands=0" + args + "\" " + where_val
+            request = "UPDATE chats SET allow_commands=0 " + where_val
             answer = storage.execute_command(request)
         elif args in self.enable_commands:
-            request = "UPDATE chats SET allow_commands=1" + args+"\" " + where_val
+            request = "UPDATE chats SET allow_commands=1 " + where_val
             answer = storage.execute_command(request)
         else:
             answer = "Bad command arguments"

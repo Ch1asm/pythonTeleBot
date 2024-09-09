@@ -55,6 +55,7 @@ class StorageHandler:
                      allow_text integer,
                      allow_voice integer,
                      allow_boobs integer,
+                     allow_commands integer,
                      PRIMARY KEY(chat_id, thread_id))
                     ''')
             self.connection_db.commit()
@@ -130,13 +131,15 @@ class StorageHandler:
                                'system_message, '
                                'allow_text, '
                                'allow_voice,'
-                               'allow_boobs) '
-                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                               'allow_boobs, '
+                               'allow_commands) '
+                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                                (message.chat.id,
                                 message.chat.title,
                                 message.message_thread_id,
                                 "default",
                                 "default",
+                                0,
                                 0,
                                 0,
                                 0))
@@ -317,13 +320,23 @@ class StorageHandler:
             logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
             return []
 
+
+    def get_allowed_chat_commands(self):
+        cursor = self.connection_db.cursor()
+        try:
+            resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_commands=1')
+            return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
+        except Exception as e:
+            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            return []
+
     def execute_command(self, command: str):
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute(command)
             answer = '\n'.join(str(item) for item in resp.fetchall())
             if answer == "":
-                return "success"
+                return "Command success"
             return answer
 
         except Exception as e:

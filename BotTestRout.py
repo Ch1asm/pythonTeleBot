@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from telbot_storage_handler import StorageHandler
 from gpt_handler import GptHandler
-import command_parser
+from command_handler import CommandHandler
 from allow_lists import AllowedLists
 import random
 
@@ -39,7 +39,7 @@ def handle_all_text(message):
     else:
         if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text:
             if stor_answer != "":
-                storage.log_message(bot.send_message(float(os.environ.get("TG_BOT_ADMIN")), stor_answer),
+                storage.log_message(bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), stor_answer),
                                     None, None, None)
             answer = generate_bot_answer(message)
             if answer != "":
@@ -58,22 +58,15 @@ def handle_all_voice(message):
 
 
 def generate_bot_answer(message):
+    # ветка для обработки команд
+    if (message.text.lower().startswith("/") and
+            (str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_commands_list
+             or message.from_user.id == float(os.environ.get("TG_BOT_ADMIN")))):
+        handler = CommandHandler()
+        if handler.is_command(message, float(os.environ.get("TG_BOT_ADMIN"))):
+            return handler.handle(message, float(os.environ.get("TG_BOT_ADMIN")), storage)
     # проверка на разрешенный чат
     if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text:
-        if message.text.lower().startswith("$bot") and (message.from_user.id in all_list.allowed_command_user_list):
-            # ветка для обработки команд
-            command = command_parser.parse(message.text,
-                                           message.from_user.id == float(os.environ.get("TG_BOT_ADMIN")),
-                                           message.from_user.id,
-                                           message.chat.id)
-            if command.startswith("SELECT"):
-                return storage.execute_command(command)
-            elif command.startswith("UPDATE"):
-                answer = storage.execute_command(command)
-                all_list.update(storage)
-                return answer
-            else:
-                return command
         if storage.checkgptstory(message, os.environ.get("APP_BOT_ID")):
             # ветка для обработки переписок с ботом
             gptdialog = storage.getmessagegptthread(message, os.environ.get("APP_BOT_ID"),

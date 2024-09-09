@@ -111,7 +111,8 @@ class StorageHandler:
         # adding chat info if new
         exist_chats = None
         try:
-            exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=?', (message.chat.id,))
+            exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=? and thread_id=?',
+                                         (message.chat.id, message.message_thread_id))
         except Exception as e:
             logging.debug("Cannot SELECT chat_id from database: ", e.__repr__(), e.args)
             pass

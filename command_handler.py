@@ -66,7 +66,7 @@ class CommandHandler:
             where_val = "WHERE chat_id="+str(message.chat.id)+" AND " + "thread_id is NULL"
         else:
             where_val = "WHERE chat_id="+str(message.chat.id)+" AND " + "thread_id="+str(message.message_thread_id)
-        if args is None:
+        if args == "":
             request = "SELECT allow_text FROM chats " + where_val
             answer = storage.execute_command(request)
         elif args in self.disable_commands:

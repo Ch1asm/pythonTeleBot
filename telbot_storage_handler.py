@@ -231,9 +231,12 @@ class StorageHandler:
                     counter = counter - 1
                 else:
                     prev_msg_id = 0
-
-        chat_sys_message = cursor.execute('SELECT system_message FROM chats WHERE chat_id=? and thread_id=?',
-                                          (message.chat.id, message.message_thread_id, ))
+        if message.message_thread_id is not None:
+            chat_sys_message = cursor.execute('SELECT system_message FROM chats WHERE chat_id=? and thread_id=?',
+                                              (message.chat.id, message.message_thread_id, ))
+        else:
+            chat_sys_message = cursor.execute('SELECT system_message FROM chats WHERE chat_id=? and thread_id is NULL',
+                                              (message.chat.id, ))
         rows = chat_sys_message.fetchall()
         if rows[0] != "default":
             sys_mes = str(rows[0])

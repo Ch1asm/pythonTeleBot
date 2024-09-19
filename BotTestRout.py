@@ -37,13 +37,13 @@ def handle_all_text(message):
         if boobs_ans is not None:
             storage.log_message(bot.reply_to(message, boobs_ans), None, None, None)
     else:
-#        if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text or:
-            if stor_answer != "":
-                storage.log_message(bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), stor_answer),
-                                    None, None, None)
-            answer = generate_bot_answer(message)
-            if answer != "":
-                storage.log_message(bot.reply_to(message, answer), None, None, None)
+        #        if str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_list_text or:
+        if stor_answer != "":
+            storage.log_message(bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), stor_answer),
+                                None, None, None)
+        answer = generate_bot_answer(message)
+        if answer != "":
+            storage.log_message(bot.reply_to(message, answer), None, None, None)
 
 
 @bot.message_handler(func=lambda msg: msg.voice.mime_type == "audio/ogg", content_types=["voice"])
@@ -91,7 +91,7 @@ def boobs_handle(boobs_pass: str, message: telebot.types.Message):
     files = [f for f in files if os.path.isfile(os.path.join(boobs_pass, f))]
     if not files:
         return "It's a disaster! We don't have tits to show!"
-    boobs_file = open(boobs_pass+random.choice(files), 'rb')
+    boobs_file = open(boobs_pass + random.choice(files), 'rb')
     bot.send_video(message.chat.id,
                    boobs_file,
                    reply_to_message_id=message.message_id,
@@ -100,5 +100,5 @@ def boobs_handle(boobs_pass: str, message: telebot.types.Message):
     boobs_file.close()
     return None
 
-
+bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "restarted")
 bot.polling()

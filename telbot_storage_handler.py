@@ -60,7 +60,7 @@ class StorageHandler:
                     ''')
             self.connection_db.commit()
         except Exception as e:
-            logging.debug("Error when creating/connecting database: ", e.__repr__(), e.args)
+            logging.debug("Error when creating/connecting database: %s", e.__repr__(), e.args)
             pass
         else:
             logging.debug("DB " + str(db_pass) + " connection success.")
@@ -78,7 +78,7 @@ class StorageHandler:
         try:
             exist_users = cursor.execute('SELECT * FROM users WHERE user_id=?', (message.from_user.id,))
         except Exception as e:
-            logging.debug("Cannot SELECT user_id from database: ", e.__repr__(), e.args)
+            logging.debug("Cannot SELECT user_id from database: %s", e.__repr__(), e.args)
             pass
         if exist_users.fetchone() is None:
             try:
@@ -106,7 +106,7 @@ class StorageHandler:
                 logging.debug("New user " + str(message.from_user.id) + " added")
                 answer = ("New user: \n" + str(message.from_user.id) + "\n" + chat_name)
             except Exception as e:
-                logging.debug("Cannot INSERT user_id to database: ", e.__repr__(), e.args)
+                logging.debug("Cannot INSERT user_id to database: %s", e.__repr__(), e.args)
         else:
             logging.debug("User " + str(message.from_user.id) + " exists")
         # adding chat info if new
@@ -119,7 +119,7 @@ class StorageHandler:
                 exist_chats = cursor.execute('SELECT * FROM chats WHERE chat_id=? and thread_id is Null',
                                              (message.chat.id,))
         except Exception as e:
-            logging.debug("Cannot SELECT chat_id from database: ", e.__repr__(), e.args)
+            logging.debug("Cannot SELECT chat_id from database: %s", e.__repr__(), e.args)
             pass
         if exist_chats.fetchone() is None:
             try:
@@ -147,7 +147,7 @@ class StorageHandler:
                 logging.debug("New chat " + str(message.chat.id) + " added")
                 answer = ("New chat: \n" + str(message.chat.id))
             except Exception as e:
-                logging.debug("Cannot INSERT chat_id to database: ", e.__repr__(), e.args)
+                logging.debug("Cannot INSERT chat_id to database: %s", e.__repr__(), e.args)
         else:
             logging.debug("Chat " + str(message.chat.id) + " exists")
         # adding message info
@@ -181,7 +181,7 @@ class StorageHandler:
             self.connection_db.commit()
             logging.debug("New messaage ", message.id, " added")
         except Exception as e:
-            logging.debug("Cannot INSERT message to database: ", e.__repr__(), e.args)
+            logging.debug("Cannot INSERT message to database: %s", e.__repr__(), e.args)
         return answer
 
     def getmessagegptthread(self, message: telebot.types.Message, bot_id: str, sys_mes: str):
@@ -208,7 +208,7 @@ class StorageHandler:
                                                prev_msg_id,))
                     rows = prev_msg.fetchall()
                 except Exception as e:
-                    logging.debug("No such message in stored dialogs: ", e.__repr__(), e.args)
+                    logging.debug("No such message in stored dialogs: %s", e.__repr__(), e.args)
 
                 if len(rows) != 0:
                     role = "user"
@@ -268,7 +268,7 @@ class StorageHandler:
                                   ))
             return str(row.fetchall()[0])
         except Exception as e:
-            logging.debug("Cannot find user in DB: ", e.__repr__(), e.args)
+            logging.debug("Cannot find user in DB: %s", e.__repr__(), e.args)
             return "Гость"
 
     def getchatnamebyid(self, user_id: int):
@@ -281,7 +281,7 @@ class StorageHandler:
                                   ))
             return str(row.fetchall()[0])
         except Exception as e:
-            logging.debug("Cannot find user in DB: ", e.__repr__(), e.args)
+            logging.debug("Cannot find user in DB: %s", e.__repr__(), e.args)
             return "Гость"
 
     # Getting list of chats where text messaging is allowed
@@ -291,7 +291,7 @@ class StorageHandler:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_text=1')
             return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: %s", e.__repr__(), e.args)
             return []
 
     # Getting list of chats where voice messaging is allowed
@@ -301,7 +301,7 @@ class StorageHandler:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_voice=1')
             return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: %s", e.__repr__(), e.args)
             return []
 
     # Getting list of chats where send boobs is allowed
@@ -311,7 +311,7 @@ class StorageHandler:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_boobs=1')
             return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: %s", e.__repr__(), e.args)
             return []
 
     def get_allowed_command_users(self):
@@ -320,7 +320,7 @@ class StorageHandler:
             resp = cursor.execute('SELECT user_id FROM users WHERE allowed_commands=1')
             return [item[0] for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: %s", e.__repr__(), e.args)
             return []
 
     def get_allowed_chat_commands(self):
@@ -329,7 +329,7 @@ class StorageHandler:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_commands=1')
             return [str(item[0]) + str(item[1]) for item in resp.fetchall()]
         except Exception as e:
-            logging.debug("Cannot get allow text chats in database: ", e.__repr__(), e.args)
+            logging.debug("Cannot get allow text chats in database: %s", e.__repr__(), e.args)
             return []
 
     def execute_command(self, command: str):
@@ -342,5 +342,5 @@ class StorageHandler:
             return answer
 
         except Exception as e:
-            logging.debug("Cannot execute command: " + command + "\n", e.__repr__(), e.args)
+            logging.debug("Cannot execute command: %s" + command + "\n", e.__repr__(), e.args)
             return "Cannot execute command: " + command + "\n"

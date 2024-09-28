@@ -8,12 +8,24 @@ from gpt_handler import GptHandler
 from command_handler import CommandHandler
 from allow_lists import AllowedLists
 import random
+import time
+from requests.exceptions import ReadTimeout
 
 # loading variables from .env file
 load_dotenv("tggptbot.env")
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
+# Создаем обработчик для записи логов в файл
+file_handler = logging.FileHandler('bot.log')  # Имя файла для логов
+file_handler.setLevel(logging.DEBUG)  # Устанавливаем уровень для файла
+
+# Определяем формат логов
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Добавляем обработчик в логгер
+logger.addHandler(file_handler)
 
 bot = telebot.TeleBot(os.environ.get("TG_BOT_TOKEN"))
 storage = StorageHandler(Path(os.environ.get("APP_DB_PATH")))
@@ -101,4 +113,9 @@ def boobs_handle(boobs_pass: str, message: telebot.types.Message):
     return None
 
 bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "restarted")
-bot.polling()
+while True:
+    try:
+        bot.polling(none_stop=True, timeout=30, long_polling_timeout=10)
+    except ReadTimeout:
+        bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "Read timeout! Restarting...")
+        time.sleep(5)  # Подождать 5 секунд перед повторной попыткой

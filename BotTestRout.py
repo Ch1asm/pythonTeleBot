@@ -15,10 +15,11 @@ from requests.exceptions import ReadTimeout
 load_dotenv("tggptbot.env")
 
 logger = telebot.logger
-telebot.logger.setLevel(logging.DEBUG)
+telebot.logger.setLevel(logging.ERROR)
+
 # Создаем обработчик для записи логов в файл
 file_handler = logging.FileHandler('bot.log')  # Имя файла для логов
-file_handler.setLevel(logging.DEBUG)  # Устанавливаем уровень для файла
+file_handler.setLevel(logging.ERROR)  # Устанавливаем уровень для файла
 
 # Определяем формат логов
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

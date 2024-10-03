@@ -117,6 +117,7 @@ bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "restarted")
 while True:
     try:
         bot.polling(none_stop=True, timeout=30, long_polling_timeout=10)
-    except ReadTimeout:
+    except ReadTimeout as e:
+        logging.exception("Read timeout", e.__repr__(), e.args)
         bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "Read timeout! Restarting...")
         time.sleep(5)  # Подождать 5 секунд перед повторной попыткой

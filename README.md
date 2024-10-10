@@ -1,4 +1,4 @@
-This is a simple telegram bot.
+This is a simple telegram bot. It's my learning project.
 Has only four tasks:
 1. Logs user messages from chats into the database (SQLite).
 2. Can support dialogue via GPT (Open AI API)

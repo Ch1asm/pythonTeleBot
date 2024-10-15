@@ -2,6 +2,7 @@ from openai import OpenAI
 import logging
 import time
 
+logger = logging.getLogger(__name__)
 
 class GptHandler:
 
@@ -28,7 +29,7 @@ class GptHandler:
                                                                   max_tokens=5000)
             self.last_text_send_time = time.time()  # запомнили время последней отправки
         except Exception as e:
-            logging.exception("Нет ответа от GPT: $s", e.__repr__(), e.args)
+            logger.exception("Нет ответа от GPT: $s", e.__repr__(), e.args)
             return "Exception from OpenAI GPT: " + str(e.__repr__()) + str(e.args)
         return chat_completion.choices[0].message.content
 
@@ -45,5 +46,5 @@ class GptHandler:
             self.last_voice_send_time = time.time()
             return answer
         except Exception as e:
-            logging.exception("Нет ответа от whisper: %s", e.__repr__(), e.args)
+            logger.exception("Нет ответа от whisper: %s", e.__repr__(), e.args)
             return "Exception from OpenAI Whisper: " + str(e.__repr__()) + str(e.args)

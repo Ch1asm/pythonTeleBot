@@ -13,6 +13,7 @@ class StorageHandler:
 
     # db_pass - pass to out database, we'll check if it's exists, and create if it's not
     def __init__(self, db_pass: Path):
+        logger.info("__init__ StoreHandler")
         try:
             db_pass.resolve(strict=True)
         except FileNotFoundError as e:
@@ -66,10 +67,12 @@ class StorageHandler:
 
     # Closing connection for no memory licks
     def __del__(self):
+        logger.info("__del__ StoreHandler")
         self.connection_db.close()
 
     # store info about user, chat and message
     def log_message(self, message: telebot.types.Message, photo_path, voice_path, voice_text):
+        logger.info("log_message StoreHandler")
         # adding user info if new
         answer = ""
         exist_users = None
@@ -184,6 +187,7 @@ class StorageHandler:
         return answer
 
     def getmessagegptthread(self, message: telebot.types.Message, bot_id: str, sys_mes: str):
+        logger.info("getmessagegptthread StoreHandler")
         dialog = [
             {
                 "role": "user",
@@ -250,6 +254,7 @@ class StorageHandler:
 
     @staticmethod
     def checkgptstory(message: telebot.types.Message, bot_id: str):
+        logger.info("checkgptstory StoreHandler")
         if "@бармен" in message.text.lower() or "@bartender_kabak_bot" in message.text.lower():
             return True
         if message.reply_to_message is not None:
@@ -258,6 +263,7 @@ class StorageHandler:
         return False
 
     def getchatnamebymessage(self, message: telebot.types.Message):
+        logger.info("getchatnamebymessage StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             row = cursor.execute('SELECT chat_name '
@@ -271,6 +277,7 @@ class StorageHandler:
             return "Гость"
 
     def getchatnamebyid(self, user_id: int):
+        logger.info("getchatnamebyid StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             row = cursor.execute('SELECT chat_name '
@@ -285,6 +292,7 @@ class StorageHandler:
 
     # Getting list of chats where text messaging is allowed
     def get_allowed_chat_text(self):
+        logger.info("get_allowed_chat_text StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_text=1')
@@ -295,6 +303,7 @@ class StorageHandler:
 
     # Getting list of chats where voice messaging is allowed
     def get_allowed_chat_voice(self):
+        logger.info("get_allowed_chat_voice StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_voice=1')
@@ -305,6 +314,7 @@ class StorageHandler:
 
     # Getting list of chats where send boobs is allowed
     def get_allowed_chat_boobs(self):
+        logger.info("get_allowed_chat_boobs StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_boobs=1')
@@ -314,6 +324,7 @@ class StorageHandler:
             return []
 
     def get_allowed_command_users(self):
+        logger.info("get_allowed_command_users StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT user_id FROM users WHERE allowed_commands=1')
@@ -323,6 +334,7 @@ class StorageHandler:
             return []
 
     def get_allowed_chat_commands(self):
+        logger.info("get_allowed_chat_commands StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute('SELECT chat_id, thread_id FROM chats WHERE allow_commands=1')
@@ -332,6 +344,7 @@ class StorageHandler:
             return []
 
     def execute_command(self, command: str):
+        logger.info("execute_command StoreHandler")
         cursor = self.connection_db.cursor()
         try:
             resp = cursor.execute(command)

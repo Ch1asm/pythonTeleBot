@@ -19,7 +19,7 @@ telebot.logger.setLevel(logging.ERROR)
 
 # Создаем обработчик для записи логов в файл
 file_handler = logging.FileHandler('bot.log')  # Имя файла для логов
-file_handler.setLevel(logging.ERROR)  # Устанавливаем уровень для файла
+file_handler.setLevel(logging.DEBUG)  # Устанавливаем уровень для файла
 
 # Определяем формат логов
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -38,11 +38,13 @@ boobs_words_list = ['сиськи', 'титьки', 'бюст', 'буфера', 
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
+    logger.info("send_welcome "+str(message.message_id) + " " + message.text)
     bot.reply_to(message, "It's a private bot. Contact to owner for more info.")
 
 
 @bot.message_handler(content_types=['text'])
 def handle_all_text(message):
+    logger.info("handle_all_text " + str(message.message_id) + " " + message.text)
     stor_answer = storage.log_message(message, None, None, None)
     if (is_boobs_included(message.text) and
             str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_boobs_list):
@@ -61,6 +63,7 @@ def handle_all_text(message):
 
 @bot.message_handler(func=lambda msg: msg.voice.mime_type == "audio/ogg", content_types=["voice"])
 def handle_all_voice(message):
+    logger.info("handle_all_voice " + str(message.message_id))
     file_info = bot.get_file(message.voice.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
     answer = gpt.get_gpt_audio_text(downloaded_file)
@@ -71,6 +74,7 @@ def handle_all_voice(message):
 
 
 def generate_bot_answer(message):
+    logger.info("generate_bot_answer " + str(message.message_id))
     # ветка для обработки команд
     if (message.text.lower().startswith("/") and
             (str(message.chat.id) + ".0" + str(message.message_thread_id) in all_list.allowed_chat_commands_list
@@ -93,6 +97,7 @@ def generate_bot_answer(message):
 
 
 def is_boobs_included(text: str):
+    logger.info("is_boobs_included")
     for elem in boobs_words_list:
         if elem in text.lower():
             return True
@@ -100,6 +105,7 @@ def is_boobs_included(text: str):
 
 
 def boobs_handle(boobs_pass: str, message: telebot.types.Message):
+    logger.info("boobs_handle " + str(message.message_id))
     files = os.listdir(boobs_pass)
     files = [f for f in files if os.path.isfile(os.path.join(boobs_pass, f))]
     if not files:
@@ -119,6 +125,6 @@ while True:
     try:
         bot.polling(none_stop=True, timeout=30, long_polling_timeout=10)
     except ReadTimeout as e:
-        logging.exception("Read timeout", e.__repr__(), e.args)
+        logger.exception("Read timeout", e.__repr__(), e.args)
         bot.send_message(str(os.environ.get("TG_BOT_ADMIN")), "Read timeout! Restarting...")
         time.sleep(5)  # Подождать 5 секунд перед повторной попыткой
